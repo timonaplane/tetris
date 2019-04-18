@@ -19,37 +19,41 @@ CYAN = 0x00ffff
 PURPLE = 0x800080
 ORANGE = 0xffa500
 
-#Some size variables
-WIDTH = 600
-HEIGHT = 600
+#Some size variables - ensure that PIECE_SIZE IS A MULTIPLE OF BOTH WIDTH AND HEIGHT
+#10 columns
+#20 rows
 PIECE_SIZE = 25
+#WIDTH is how many columns
+WIDTH = 10 * PIECE_SIZE
+#HEIGHT IS HOW MANY ROWS
+HEIGHT = 20 * PIECE_SIZE
 
 #80 rows -> 400
-#25 columns - > 125
+#PIECE_SIZE columns - > 1PIECE_SIZE
 
 #set up some pygame stuff
 pygame.font.init()
 font = pygame.font.Font(None, 36)
 
 # define the piece rotations
-z_rotations = [[Node(0,0) , Node(25, 0) , Node (25, 25), Node(50,25)],
-[Node(25,0), Node(25,25), Node(50,0), Node(50,-25)]]
-s_rotations = [[Node(0,0), Node(25,0), Node(25,-25), Node(50,-25)],
-[Node(0,-25), Node(0,-50), Node(25,-25), Node(25,0)]]
-i_rotations = [[Node(0,0), Node(25, 0), Node(50,0) , Node(75,0)],
-[Node(25,-25), Node(25,0), Node(25,25), Node(25,50)]]
-t_rotations = [[Node(0,0), Node(25, 0), Node(50,0), Node(25,25)],
-[Node(0,0), Node(25,0), Node(25,-25), Node(25,25)],
-[Node(25,-25), Node(0,0), Node(25,0), Node(50,0)],
-[Node(50,0), Node(25,-25), Node(25,0), Node(25,25)]]
-l_rotations = [[Node(0,0),Node(0,25),Node(25,0),Node(50,0)],
-[Node(0,0),Node(25,0),Node(25,25),Node(25,50)],
-[Node(0,50),Node(25,50),Node(50,25),Node(50,50)],
-[Node(25,0),Node(25,25),Node(25,50),Node(50,50)]]
-j_rotations = [[Node(0,0), Node(25,0), Node(50,0), Node(50,25)],
-[Node(0,50), Node(25,0),Node(25,25),Node(25,50)],
-[Node(0,25),Node(0,50),Node(25,50),Node(50,50)],
-[Node(25,0),Node(25,25),Node(25,50),Node(50,0)]]
+z_rotations = [[Node(0,0) , Node(PIECE_SIZE, 0) , Node (PIECE_SIZE, PIECE_SIZE), Node(PIECE_SIZE * 2,PIECE_SIZE)],
+[Node(PIECE_SIZE,0), Node(PIECE_SIZE,PIECE_SIZE), Node(PIECE_SIZE * 2,0), Node(PIECE_SIZE * 2,-PIECE_SIZE)]]
+s_rotations = [[Node(0,0), Node(PIECE_SIZE,0), Node(PIECE_SIZE,-PIECE_SIZE), Node(PIECE_SIZE * 2,-PIECE_SIZE)],
+[Node(0,-PIECE_SIZE), Node(0,-PIECE_SIZE * 2), Node(PIECE_SIZE,-PIECE_SIZE), Node(PIECE_SIZE,0)]]
+i_rotations = [[Node(0,0), Node(PIECE_SIZE, 0), Node(PIECE_SIZE * 2,0) , Node(PIECE_SIZE * 3,0)],
+[Node(PIECE_SIZE,-PIECE_SIZE), Node(PIECE_SIZE,0), Node(PIECE_SIZE,PIECE_SIZE), Node(PIECE_SIZE,PIECE_SIZE * 2)]]
+t_rotations = [[Node(0,0), Node(PIECE_SIZE, 0), Node(PIECE_SIZE * 2,0), Node(PIECE_SIZE,PIECE_SIZE)],
+[Node(0,0), Node(PIECE_SIZE,0), Node(PIECE_SIZE,-PIECE_SIZE), Node(PIECE_SIZE,PIECE_SIZE)],
+[Node(PIECE_SIZE,-PIECE_SIZE), Node(0,0), Node(PIECE_SIZE,0), Node(PIECE_SIZE * 2,0)],
+[Node(PIECE_SIZE * 2,0), Node(PIECE_SIZE,-PIECE_SIZE), Node(PIECE_SIZE,0), Node(PIECE_SIZE,PIECE_SIZE)]]
+l_rotations = [[Node(0,0),Node(0,PIECE_SIZE),Node(PIECE_SIZE,0),Node(PIECE_SIZE * 2,0)],
+[Node(0,0),Node(PIECE_SIZE,0),Node(PIECE_SIZE,PIECE_SIZE),Node(PIECE_SIZE,PIECE_SIZE * 2)],
+[Node(0,PIECE_SIZE * 2),Node(PIECE_SIZE,PIECE_SIZE * 2),Node(PIECE_SIZE * 2,PIECE_SIZE),Node(PIECE_SIZE * 2,PIECE_SIZE * 2)],
+[Node(PIECE_SIZE,0),Node(PIECE_SIZE,PIECE_SIZE),Node(PIECE_SIZE,PIECE_SIZE * 2),Node(PIECE_SIZE * 2,PIECE_SIZE * 2)]]
+j_rotations = [[Node(0,0), Node(PIECE_SIZE,0), Node(PIECE_SIZE * 2,0), Node(PIECE_SIZE * 2,PIECE_SIZE)],
+[Node(0,PIECE_SIZE * 2), Node(PIECE_SIZE,0),Node(PIECE_SIZE,PIECE_SIZE),Node(PIECE_SIZE,PIECE_SIZE * 2)],
+[Node(0,PIECE_SIZE),Node(0,PIECE_SIZE * 2),Node(PIECE_SIZE,PIECE_SIZE * 2),Node(PIECE_SIZE * 2,PIECE_SIZE * 2)],
+[Node(PIECE_SIZE,0),Node(PIECE_SIZE,PIECE_SIZE),Node(PIECE_SIZE,PIECE_SIZE * 2),Node(PIECE_SIZE * 2,0)]]
 
 
 
@@ -58,46 +62,46 @@ def generate_piece(piece_type):
     new_list = []
     if piece_type == 'z':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(25,25))
-        new_list.append(Node(50,25))
-        return new_list,RED
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE,PIECE_SIZE))
+        new_list.append(Node(PIECE_SIZE * 2,PIECE_SIZE))
+        return new_list,RED,0
     elif piece_type == 's':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(25,-25))
-        new_list.append(Node(50,-25))
-        return new_list,GREEN
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE,-PIECE_SIZE))
+        new_list.append(Node(PIECE_SIZE * 2,-PIECE_SIZE))
+        return new_list,GREEN,0
     elif piece_type == 'i':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(50,0))
-        new_list.append(Node(75,0))
-        return new_list,CYAN
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE * 2,0))
+        new_list.append(Node(PIECE_SIZE * 3,0))
+        return new_list,CYAN,0
     elif piece_type == 't':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(50,0))
-        new_list.append(Node(25,25))
-        return new_list,PURPLE
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE * 2,0))
+        new_list.append(Node(PIECE_SIZE,PIECE_SIZE))
+        return new_list,PURPLE,0
     elif piece_type == 'o':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(0,-25))
-        new_list.append(Node(25,-25))
-        return new_list,YELLOW
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(0,-PIECE_SIZE))
+        new_list.append(Node(PIECE_SIZE,-PIECE_SIZE))
+        return new_list,YELLOW,0
     elif piece_type == 'l':
         new_list.append(Node(0,0))
-        new_list.append(Node(0,25))
-        new_list.append(Node(25,0))
-        new_list.append(Node(50,0))
-        return new_list,BLUE
+        new_list.append(Node(0,PIECE_SIZE))
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE * 2,0))
+        return new_list,BLUE,0
     elif piece_type =='j':
         new_list.append(Node(0,0))
-        new_list.append(Node(25,0))
-        new_list.append(Node(50,0))
-        new_list.append(Node(50,-25))
-        return new_list,ORANGE
+        new_list.append(Node(PIECE_SIZE,0))
+        new_list.append(Node(PIECE_SIZE * 2,0))
+        new_list.append(Node(PIECE_SIZE * 2,-PIECE_SIZE))
+        return new_list,ORANGE,0
 
 
 
@@ -168,21 +172,28 @@ def rotate_piece(piece_list , piece_type, piece_status, PIECE_X, PIECE_Y, direct
     return PIECE_X, PIECE_Y, temp_piece_status
 
 #also need to check the game_matrix
-def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction):
+def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction, GAME_MATRIX):
     if direction == 'left':
         for x in curr_piece:
-            if(x.x + PIECE_X - 25 < 0):
+            if(x.x + PIECE_X - PIECE_SIZE < 0):
                 return False
+            if GAME_MATRIX[(x.x + PIECE_X - PIECE_SIZE)//PIECE_SIZE][(x.y+PIECE_Y)//PIECE_SIZE] != 'p':
+                return False
+
     else:
         for x in curr_piece:
-            if(x.x + PIECE_X + 25 >= WIDTH):
+            if(x.x + PIECE_X + PIECE_SIZE >= WIDTH):
+                return False
+            if GAME_MATRIX[(x.x + PIECE_X + PIECE_SIZE)//PIECE_SIZE][(x.y+PIECE_Y)//PIECE_SIZE] != 'p':
                 return False
     return True
 #also need to check the game_matrix
 
-def can_move_down(curr_piece, PIECE_X, PIECE_Y):
+def can_move_down(curr_piece, PIECE_X, PIECE_Y,GAME_MATRIX):
     for x in curr_piece:
-        if x.y + PIECE_Y + 25 >= HEIGHT:
+        if x.y + PIECE_Y + PIECE_SIZE >= HEIGHT:
+            return False
+        if GAME_MATRIX[(x.x + PIECE_X)//PIECE_SIZE][(x.y+PIECE_Y+PIECE_SIZE)//PIECE_SIZE] != 'p':
             return False
     return True
 
@@ -195,16 +206,41 @@ def lock_piece(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX,piece_type):
         GAME_MATRIX[(x.x + PIECE_X)//PIECE_SIZE][(x.y + PIECE_Y) //PIECE_SIZE] = piece_type
 
     return GAME_MATRIX
+def clear_rows(curr_piece,PIECE_X, PIECE_Y,GAME_MATRIX):
+    #get the rows that have been cleared
+    rows = set()
+    cleared_rows = set()
+    for x in curr_piece:
+        rows.add((x.y + PIECE_Y)//PIECE_SIZE)
+    row_cleared = True
+    for x in rows:
+        for y in range(0,WIDTH//PIECE_SIZE):
+            if GAME_MATRIX[y][x] == 'p':
+                row_cleared = False
+        if(row_cleared == True):
+            cleared_rows.add(x)
+        row_cleared=True
+    for z in cleared_rows:
+        for y in range(0,WIDTH//PIECE_SIZE):
+            GAME_MATRIX[y][z] = 'p'
+    cleared_rows = sorted(cleared_rows, reverse=True)
+    for u in cleared_rows:
+        for v in range(u,1,-1):
+            GAME_MATRIX[v].clear()
+            GAME_MATRIX[v].append(GAME_MATRIX[v-1])
+
+
+    return GAME_MATRIX
 
 def main():
     #Set up the main stuff
     pygame.init()
     surface = pygame.display.set_mode((WIDTH,HEIGHT))
-    GAME_MATRIX = [['p' for x in range(WIDTH//PIECE_SIZE)] for y in range(HEIGHT//PIECE_SIZE)]
+    GAME_MATRIX = [['p' for x in range(HEIGHT//PIECE_SIZE)] for y in range(WIDTH//PIECE_SIZE)]
 
     #Move down timer
     timer = 0
-    PIECE_X = 200
+    PIECE_X = WIDTH//2
     PIECE_Y = 0
     curr_piece = []
     piece_status = 0
@@ -213,7 +249,7 @@ def main():
     pieces = ['i','o','t','s','z','j','l']
     color_maps = {'i':CYAN, 'o':YELLOW, 't':PURPLE, 's':GREEN,'z':RED,'j':ORANGE,'l':BLUE}
     piece_type = pieces[random.randint(0,6)]
-    curr_piece,color = generate_piece(piece_type)
+    curr_piece,color,piece_status = generate_piece(piece_type)
     can_move1 = True
 
 
@@ -225,10 +261,10 @@ def main():
                 pygame.quit()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_a or event.key == pygame.K_LEFT:
-                    if(can_move_horiz(curr_piece,PIECE_X,PIECE_Y,'left')):
+                    if(can_move_horiz(curr_piece,PIECE_X,PIECE_Y,'left',GAME_MATRIX)):
                         PIECE_X -= PIECE_SIZE
                 elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
-                    if(can_move_horiz(curr_piece,PIECE_X,PIECE_Y,'right')):
+                    if(can_move_horiz(curr_piece,PIECE_X,PIECE_Y,'right',GAME_MATRIX)):
                         PIECE_X += PIECE_SIZE
                 elif event.key == pygame.K_z:
 
@@ -236,28 +272,35 @@ def main():
                 elif event.key == pygame.K_x:
                     PIECE_X, PIECE_Y, piece_status = rotate_piece(curr_piece, piece_type, piece_status, PIECE_X, PIECE_Y, 'right')
                 elif event.key == pygame.K_DOWN:
-                    if(can_move_down(curr_piece,PIECE_X,PIECE_Y)==True):
+                    if(can_move_down(curr_piece,PIECE_X,PIECE_Y,GAME_MATRIX)==True):
                         PIECE_Y += PIECE_SIZE
                     else:
                         #add to the array
                         need_new_piece = True
                         GAME_MATRIX = lock_piece(curr_piece,PIECE_X,PIECE_Y,GAME_MATRIX,piece_type)
+                        #clear rows
+                        GAME_MATRIX = clear_rows(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX)
                         timer = 0
 
         if(timer >= 1000):
             #can_move1 = can_move(curr_piece)
-            if(can_move_down(curr_piece, PIECE_X, PIECE_Y) == True):
+            if(can_move_down(curr_piece, PIECE_X, PIECE_Y,GAME_MATRIX) == True):
                 PIECE_Y += PIECE_SIZE
                 timer = 0
             else:
                 GAME_MATRIX = lock_piece(curr_piece,PIECE_X,PIECE_Y,GAME_MATRIX,piece_type)
+                #clear rows
+                GAME_MATRIX = clear_rows(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX)
+
                 timer = 0
                 need_new_piece = True
+
         if(need_new_piece == True):
             piece_type = pieces[random.randint(0,6)]
-            curr_piece,color = generate_piece(piece_type)
+            curr_piece,color,piece_status = generate_piece(piece_type)
+
             need_new_piece = False
-            PIECE_X = 200
+            PIECE_X = WIDTH//2
             PIECE_Y = 0
 
 
