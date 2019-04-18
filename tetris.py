@@ -101,60 +101,73 @@ def generate_piece(piece_type):
 
 
 
+#also need to check the game_matrix
 
-
-def rotate_piece(piece_list , piece_type, piece_status, piece_x, piece_y, direction):
+#will fail to rotate piece if the rotation puts piece out of bounds
+def rotate_piece(piece_list , piece_type, piece_status, PIECE_X, PIECE_Y, direction):
+    temp_piece_list = []
+    temp_piece_list.extend(piece_list)
+    temp_piece_status = piece_status
     if(piece_type != 'o'):
-        piece_list.clear()
+        temp_piece_list.clear()
     if(direction =='right'):
-        piece_status += 1
+        temp_piece_status += 1
     elif(direction =='left'):
-        piece_status -= 1
+        temp_piece_status -= 1
 
     if piece_type == 'z':
-        if piece_status == 2:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 1
-        piece_list.extend(z_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
+        if temp_piece_status == 2:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 1
+        temp_piece_list.extend(z_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
     elif piece_type == 's':
-        if piece_status == 2:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 1
-        piece_list.extend(s_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
+        if temp_piece_status == 2:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 1
+        temp_piece_list.extend(s_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
     elif piece_type =='i':
-        if piece_status == 2:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 1
-        piece_list.extend(i_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
+        if temp_piece_status == 2:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 1
+        temp_piece_list.extend(i_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
     elif piece_type =='t':
-        if piece_status == 4:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 3
-        piece_list.extend(t_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
+        if temp_piece_status == 4:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 3
+        temp_piece_list.extend(t_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
     elif piece_type =='l':
-        if piece_status == 4:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 3
-        piece_list.extend(l_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
+        if temp_piece_status == 4:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 3
+        temp_piece_list.extend(l_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
     elif piece_type =='j':
-        if piece_status == 4:
-            piece_status = 0
-        elif piece_status == -1:
-            piece_status = 3
-        piece_list.extend(j_rotations[piece_status])
-        return piece_x, piece_y,  piece_status
-    return piece_x, piece_y, 1
+        if temp_piece_status == 4:
+            temp_piece_status = 0
+        elif temp_piece_status == -1:
+            temp_piece_status = 3
+        temp_piece_list.extend(j_rotations[temp_piece_status])
+        #return piece_x, piece_y,  piece_status
 
+    #check the temp_piece_list if in bounds
+    for x in temp_piece_list:
+        if x.x + PIECE_X < 0 or x.x + PIECE_X >= 600 or x.y + PIECE_Y >= 600:
+            return PIECE_X, PIECE_Y, piece_status
+
+    piece_list.clear()
+    piece_list.extend(temp_piece_list)
+    return PIECE_X, PIECE_Y, temp_piece_status
+
+#also need to check the game_matrix
 def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction):
     if direction == 'left':
         for x in curr_piece:
@@ -165,6 +178,7 @@ def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction):
             if(x.x + PIECE_X + 25 >= 600):
                 return False
     return True
+#also need to check the game_matrix
 
 def can_move_down(curr_piece, PIECE_X, PIECE_Y):
     for x in curr_piece:
@@ -172,8 +186,9 @@ def can_move_down(curr_piece, PIECE_X, PIECE_Y):
             return False
     return True
 
-def can_rotate(curr_piece, PIECE_X, PIECE_Y, direction, piece_status, piece_type):
-    return True
+
+
+def lock_piece(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX):
     return True
 
 def main():
@@ -185,7 +200,7 @@ def main():
     #Move down timer
     timer = 0
     PIECE_X = 200
-    PIECE_Y = 100
+    PIECE_Y = 0
     curr_piece = []
     piece_status = 0
     need_new_piece = False
@@ -210,22 +225,32 @@ def main():
                     if(can_move_horiz(curr_piece,PIECE_X,PIECE_Y,'right')):
                         PIECE_X += PIECE_SIZE
                 elif event.key == pygame.K_z:
+
                     PIECE_X, PIECE_Y, piece_status = rotate_piece(curr_piece, piece_type, piece_status, PIECE_X, PIECE_Y, 'left')
                 elif event.key == pygame.K_x:
                     PIECE_X, PIECE_Y, piece_status = rotate_piece(curr_piece, piece_type, piece_status, PIECE_X, PIECE_Y, 'right')
                 elif event.key == pygame.K_DOWN:
                     if(can_move_down(curr_piece,PIECE_X,PIECE_Y)==True):
                         PIECE_Y += PIECE_SIZE
+                    else:
+                        #add to the array
+                        need_new_piece = True
 
         if(timer >= 1000):
             #can_move1 = can_move(curr_piece)
-            print('hm')
             if(can_move_down(curr_piece, PIECE_X, PIECE_Y) == True):
                 PIECE_Y += PIECE_SIZE
                 timer = 0
             else:
                 timer = 0
-                end_game = True
+                need_new_piece = True
+        if(need_new_piece == True):
+            piece_type = pieces[random.randint(0,6)]
+            curr_piece,color = generate_piece(piece_type)
+            need_new_piece = False
+            PIECE_X = 200
+            PIECE_Y = 0
+
 
 
         #check if the piece touches bottom of screen
