@@ -160,7 +160,7 @@ def rotate_piece(piece_list , piece_type, piece_status, PIECE_X, PIECE_Y, direct
 
     #check the temp_piece_list if in bounds
     for x in temp_piece_list:
-        if x.x + PIECE_X < 0 or x.x + PIECE_X >= 600 or x.y + PIECE_Y >= 600:
+        if x.x + PIECE_X < 0 or x.x + PIECE_X >= WIDTH or x.y + PIECE_Y >= HEIGHT:
             return PIECE_X, PIECE_Y, piece_status
 
     piece_list.clear()
@@ -175,27 +175,32 @@ def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction):
                 return False
     else:
         for x in curr_piece:
-            if(x.x + PIECE_X + 25 >= 600):
+            if(x.x + PIECE_X + 25 >= WIDTH):
                 return False
     return True
 #also need to check the game_matrix
 
 def can_move_down(curr_piece, PIECE_X, PIECE_Y):
     for x in curr_piece:
-        if x.y + PIECE_Y + 25 >= 600:
+        if x.y + PIECE_Y + 25 >= HEIGHT:
             return False
     return True
 
 
 
-def lock_piece(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX):
-    return True
+def lock_piece(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX,piece_type):
+    # [add x.x = + piece_x / piece_size][add x.y = + piece_y / piece_size] to game matrix
+    print('called function')
+    for x in curr_piece:
+        GAME_MATRIX[(x.x + PIECE_X)//PIECE_SIZE][(x.y + PIECE_Y) //PIECE_SIZE] = piece_type
+
+    return GAME_MATRIX
 
 def main():
     #Set up the main stuff
     pygame.init()
     surface = pygame.display.set_mode((WIDTH,HEIGHT))
-    GAME_MATRIX = [[0 for x in range(WIDTH//PIECE_SIZE)] for y in range(HEIGHT//PIECE_SIZE)]
+    GAME_MATRIX = [['p' for x in range(WIDTH//PIECE_SIZE)] for y in range(HEIGHT//PIECE_SIZE)]
 
     #Move down timer
     timer = 0
@@ -206,6 +211,7 @@ def main():
     need_new_piece = False
     piece_type = 'l'
     pieces = ['i','o','t','s','z','j','l']
+    color_maps = {'i':CYAN, 'o':YELLOW, 't':PURPLE, 's':GREEN,'z':RED,'j':ORANGE,'l':BLUE}
     piece_type = pieces[random.randint(0,6)]
     curr_piece,color = generate_piece(piece_type)
     can_move1 = True
@@ -235,6 +241,8 @@ def main():
                     else:
                         #add to the array
                         need_new_piece = True
+                        GAME_MATRIX = lock_piece(curr_piece,PIECE_X,PIECE_Y,GAME_MATRIX,piece_type)
+                        timer = 0
 
         if(timer >= 1000):
             #can_move1 = can_move(curr_piece)
@@ -242,6 +250,7 @@ def main():
                 PIECE_Y += PIECE_SIZE
                 timer = 0
             else:
+                GAME_MATRIX = lock_piece(curr_piece,PIECE_X,PIECE_Y,GAME_MATRIX,piece_type)
                 timer = 0
                 need_new_piece = True
         if(need_new_piece == True):
@@ -261,7 +270,19 @@ def main():
         surface.fill(BLACK)
         #pygame.draw.rect(surface, RED, piece_rect)
         for x in curr_piece:
-             pygame.draw.rect(surface, color, pygame.Rect(x.x + PIECE_X ,x.y + PIECE_Y, PIECE_SIZE, PIECE_SIZE))
+            pygame.draw.rect(surface, color, pygame.Rect(x.x + PIECE_X ,x.y + PIECE_Y, PIECE_SIZE, PIECE_SIZE))
+        #display the locked boxes
+        yes = 5
+        for a in range(0, WIDTH//PIECE_SIZE):
+            for b in range(0, HEIGHT//PIECE_SIZE):
+                if(GAME_MATRIX[a][b] != 'p'):
+                    pygame.draw.rect(surface, color_maps[GAME_MATRIX[a][b]], pygame.Rect(a*PIECE_SIZE,b*PIECE_SIZE,PIECE_SIZE, PIECE_SIZE))
+        # for a in range(0,WIDTH//PIECE_SIZE):
+        #     for b in range(0,HEIGHT//PIECE_SIZE):
+        #         print('hello')
+                 #if(GAME_MATRIX[a*PIECE_SIZE][b*PIECE_SIZE] != 'p'):
+                    # pygame.draw.rect(surface, color_maps[GAME_MATRIX[a*PIECE_SIZE][b*PIECE_SIZE]], pygame.Rect(a**PIECE_SIZE,b**PIECE_SIZE,PIECE_SIZE,_PIECE_SIZE))
+
 
 
 
