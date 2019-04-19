@@ -177,14 +177,14 @@ def can_move_horiz(curr_piece, PIECE_X, PIECE_Y, direction, GAME_MATRIX):
         for x in curr_piece:
             if(x.x + PIECE_X - PIECE_SIZE < 0):
                 return False
-            if GAME_MATRIX[(x.x + PIECE_X - PIECE_SIZE)//PIECE_SIZE][(x.y+PIECE_Y)//PIECE_SIZE] != 'p':
+            if GAME_MATRIX[(x.y + PIECE_Y)//PIECE_SIZE][(x.x+PIECE_X - PIECE_SIZE)//PIECE_SIZE] != 'p':
                 return False
 
     else:
         for x in curr_piece:
             if(x.x + PIECE_X + PIECE_SIZE >= WIDTH):
                 return False
-            if GAME_MATRIX[(x.x + PIECE_X + PIECE_SIZE)//PIECE_SIZE][(x.y+PIECE_Y)//PIECE_SIZE] != 'p':
+            if GAME_MATRIX[(x.y + PIECE_Y)//PIECE_SIZE][(x.x+PIECE_X + PIECE_SIZE)//PIECE_SIZE] != 'p':
                 return False
     return True
 #also need to check the game_matrix
@@ -193,7 +193,7 @@ def can_move_down(curr_piece, PIECE_X, PIECE_Y,GAME_MATRIX):
     for x in curr_piece:
         if x.y + PIECE_Y + PIECE_SIZE >= HEIGHT:
             return False
-        if GAME_MATRIX[(x.x + PIECE_X)//PIECE_SIZE][(x.y+PIECE_Y+PIECE_SIZE)//PIECE_SIZE] != 'p':
+        if GAME_MATRIX[(x.y + PIECE_Y + PIECE_SIZE)//PIECE_SIZE][(x.x+PIECE_X)//PIECE_SIZE] != 'p':
             return False
     return True
 
@@ -203,7 +203,7 @@ def lock_piece(curr_piece, PIECE_X, PIECE_Y, GAME_MATRIX,piece_type):
     # [add x.x = + piece_x / piece_size][add x.y = + piece_y / piece_size] to game matrix
     print('called function')
     for x in curr_piece:
-        GAME_MATRIX[(x.x + PIECE_X)//PIECE_SIZE][(x.y + PIECE_Y) //PIECE_SIZE] = piece_type
+        GAME_MATRIX[(x.y + PIECE_Y)//PIECE_SIZE][(x.x + PIECE_X) //PIECE_SIZE] = piece_type
 
     return GAME_MATRIX
 def clear_rows(curr_piece,PIECE_X, PIECE_Y,GAME_MATRIX):
@@ -215,19 +215,20 @@ def clear_rows(curr_piece,PIECE_X, PIECE_Y,GAME_MATRIX):
     row_cleared = True
     for x in rows:
         for y in range(0,WIDTH//PIECE_SIZE):
-            if GAME_MATRIX[y][x] == 'p':
+            if GAME_MATRIX[x][y] == 'p':
                 row_cleared = False
         if(row_cleared == True):
             cleared_rows.add(x)
         row_cleared=True
     for z in cleared_rows:
         for y in range(0,WIDTH//PIECE_SIZE):
-            GAME_MATRIX[y][z] = 'p'
-    cleared_rows = sorted(cleared_rows, reverse=True)
+            GAME_MATRIX[z][y] = 'p'
+    #cleared_rows = sorted(cleared_rows, reverse=True)
     for u in cleared_rows:
-        for v in range(u,1,-1):
-            GAME_MATRIX[v].clear()
-            GAME_MATRIX[v].append(GAME_MATRIX[v-1])
+        for v in range(u,0,-1):
+            GAME_MATRIX[v] = GAME_MATRIX[v-1]
+            #GAME_MATRIX[v].clear()
+            #GAME_MATRIX[v].append(GAME_MATRIX[v-1])
 
 
     return GAME_MATRIX
@@ -236,7 +237,7 @@ def main():
     #Set up the main stuff
     pygame.init()
     surface = pygame.display.set_mode((WIDTH,HEIGHT))
-    GAME_MATRIX = [['p' for x in range(HEIGHT//PIECE_SIZE)] for y in range(WIDTH//PIECE_SIZE)]
+    GAME_MATRIX = [['p' for x in range(WIDTH//PIECE_SIZE)] for y in range(HEIGHT//PIECE_SIZE)]
 
     #Move down timer
     timer = 0
@@ -318,8 +319,8 @@ def main():
         yes = 5
         for a in range(0, WIDTH//PIECE_SIZE):
             for b in range(0, HEIGHT//PIECE_SIZE):
-                if(GAME_MATRIX[a][b] != 'p'):
-                    pygame.draw.rect(surface, color_maps[GAME_MATRIX[a][b]], pygame.Rect(a*PIECE_SIZE,b*PIECE_SIZE,PIECE_SIZE, PIECE_SIZE))
+                if(GAME_MATRIX[b][a] != 'p'):
+                    pygame.draw.rect(surface, color_maps[GAME_MATRIX[b][a]], pygame.Rect(a*PIECE_SIZE,b*PIECE_SIZE,PIECE_SIZE, PIECE_SIZE))
         # for a in range(0,WIDTH//PIECE_SIZE):
         #     for b in range(0,HEIGHT//PIECE_SIZE):
         #         print('hello')
